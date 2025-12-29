@@ -1,13 +1,6 @@
-/* Audio Converter Styles */
-
-/* Wrapper */
-.audio-converter-wrapper {
-  flex-grow: 1;
-}
-
 /* Header/AppBar */
 .header-appbar {
-  background-color: #1976d2 !important;
+  background-color: #084F82 !important;
   box-shadow: none !important;
 }
 
@@ -37,7 +30,7 @@
 .logo-inner {
   width: 35px;
   height: 35px;
-  background-color: #1976d2;
+  background-color: #084F82;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -56,96 +49,127 @@
   letter-spacing: 0.5px;
 }
 
-/* Profile Button */
-.profile-button {
+/* Navigation Buttons */
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-button {
   color: #fff !important;
   text-transform: none !important;
   font-size: 18px !important;
   font-weight: 500 !important;
 }
 
-.profile-button:hover {
+.home-button:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Main Content */
-.main-content {
-  margin-top: 32px;
-  margin-bottom: 32px;
-  background-color: #f5f7fa;
-  border-radius: 8px;
-  padding: 64px;
-  min-height: 70vh;
+.profile-button-container {
+  position: relative;
+}
+
+.account-button {
+  color: #fff !important;
+  text-transform: none !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 4px;
 }
 
-/* Title */
-.main-title {
-  color: #1976d2 !important;
+.account-button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.account-icon {
+  font-size: 24px !important;
+  margin-right: 4px;
+}
+
+/* Profile Dropdown Card */
+.profile-dropdown-card {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  min-width: 320px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 8px !important;
+}
+
+.profile-dropdown-content {
+  padding: 0 !important;
+}
+
+/* User Info Section */
+.user-info-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f9fafb;
+}
+
+.user-avatar {
+  background-color: #084F82 !important;
+  width: 48px !important;
+  height: 48px !important;
+  font-size: 20px !important;
   font-weight: 600 !important;
-  margin-bottom: 16px !important;
-  text-align: center;
 }
 
-/* Subtitle */
-.subtitle {
-  color: #6b7280 !important;
-  margin-bottom: 48px !important;
-  text-align: center;
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  color: #111827 !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  margin-bottom: 2px !important;
+}
+
+.user-email {
+  color: #084F82 !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
 }
 
-/* Upload Container */
-.upload-container {
-  border: 2px solid #d1d5db;
-  border-radius: 8px;
-  padding: 32px;
-  background-color: #fff;
-  min-width: 400px;
+.profile-divider {
+  margin: 0 !important;
+}
+
+/* Menu Options */
+.menu-options {
+  padding: 8px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* Upload Button */
-.upload-button {
-  background-color: #f3e8d0 !important;
-  color: #000 !important;
-  font-size: 20px !important;
-  font-weight: 600 !important;
+.menu-option-button {
+  width: 100%;
+  justify-content: flex-start !important;
   text-transform: none !important;
-  padding: 16px 32px !important;
-  border-radius: 8px !important;
-  box-shadow: none !important;
+  padding: 10px 12px !important;
+  color: #084F82 !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
 }
 
-.upload-button:hover {
-  background-color: #e8dcc0 !important;
-  box-shadow: none !important;
+.menu-option-button:hover {
+  background-color: #f3f4f6 !important;
 }
 
-.upload-icon {
-  font-size: 28px !important;
+.logout-button {
+  color: #ef4444 !important;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .main-content {
-    padding: 32px 16px;
-  }
-
-  .upload-container {
-    min-width: 100%;
-    padding: 24px;
-  }
-
-  .main-title {
-    font-size: 2rem !important;
-  }
-
-  .subtitle {
-    font-size: 1rem !important;
-  }
+.logout-button:hover {
+  background-color: #fee2e2 !important;
 }
