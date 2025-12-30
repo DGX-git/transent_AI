@@ -20,6 +20,10 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useNavigate, useLocation } from 'react-router-dom';  // Add this line
 
+// Color Constants
+const PRIMARY_BLUE = '#084F82';
+const PRIMARY_BLUE_DARKER = '#063d6b';
+
 const TranscriptionResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,29 +63,25 @@ const TranscriptionResults = () => {
           sx={{
             mt: 2,
             mb: 2,
-            backgroundColor: '#f5f7fa',
+            backgroundColor: 'var(--bg-light)',
             borderRadius: 2,
             p: 4,
             minHeight: '70vh',
+                  boxShadow: '0 4px 30px rgba(0, 0, 0, 0.08)',
+      border: '1px solid rgba(8, 79, 130, 0.08)',
           }}
         >
           {/* Header with Back Button and Title */}
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-            <Button
-              startIcon={<ArrowBackIcon />}
-               onClick={() => navigate('/transcription-results')}
-              sx={{
-                color: '#084F82',
-                textTransform: 'none',
-                fontSize: '18px',
-                fontWeight: 500,
-                '&:hover': {
-                  backgroundColor: 'transparent',
-                },
-              }}
-            >
-              Back
-            </Button>
+            <Box className="back-button-container" sx={{ mb: 0, mr: 2 }}>
+              <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={() => navigate('/transcription-results')}
+                className="back-button"
+              >
+                Back
+              </Button>
+            </Box>
             <Typography
               variant="h4"
               sx={{
@@ -105,7 +105,7 @@ const TranscriptionResults = () => {
             >
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: '#084F82' }}>
+                  <TableRow sx={{ backgroundColor: PRIMARY_BLUE }}>
               
                     <TableCell
                       sx={{ color: '#fff', fontWeight: 600, fontSize: '16px', p: 2 }}
@@ -140,13 +140,13 @@ const TranscriptionResults = () => {
       // ... existing table row code ...
        <TableRow
                       key={index}
-                      sx={{ backgroundColor: index % 2 === 0 ? '#fff' : '#f3f4f6' }}
+                      sx={{ backgroundColor: index % 2 === 0 ? 'var(--bg-white)' : 'var(--bg-gray)' }}
                     >
                       <TableCell sx={{ p: 2, textAlign: 'center' }}>
                         <Checkbox
                           sx={{
-                            color: '#084F82',
-                            '&.Mui-checked': { color: '#084F82' },
+                            color: PRIMARY_BLUE,
+                            '&.Mui-checked': { color: PRIMARY_BLUE },
                           }}
                           checked={selectedFiles.includes(index)}
                           onChange={() => handleSelectFile(index)}
@@ -184,8 +184,8 @@ const TranscriptionResults = () => {
     ))
   ) : (
         <TableRow>
-      <TableCell colSpan={4} sx={{ textAlign: 'center', p: 4, color: '#666' }}>
-        No transcription results available
+      <TableCell colSpan={6} sx={{ textAlign: 'center', p: 4, color: '#666' }}>
+        No sentiment results available
       </TableCell>
     </TableRow>
   )}
@@ -199,7 +199,7 @@ const TranscriptionResults = () => {
             {/* Pagination Footer */}
             <Box
               sx={{
-                backgroundColor: '#084F82',
+                backgroundColor: PRIMARY_BLUE,
                 p: 1.5,
                 px: 3,
                 display: 'flex',

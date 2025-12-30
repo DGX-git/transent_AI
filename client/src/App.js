@@ -5,6 +5,7 @@ import Header from "./components/header";
 import Home from "./components/home";
 import TranscriptionResults from "./components/TranscriptionResults";
 import SentimentAnalysis from "./components/sentimentAnalysis";
+import Profile from "./components/Profile";
 
 function App() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function App() {
         <Route path="/UploadFiles" element={<UploadFiles />} />
         <Route path="/transcription-results" element={<TranscriptionResults />} />
         <Route path="/sentiment-analysis" element={<SentimentAnalysis />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
   );

@@ -20,6 +20,10 @@ import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { useNavigate, useLocation } from 'react-router-dom';  // Add this line
 
+// Color Constants
+const PRIMARY_BLUE = '#084F82';
+const PRIMARY_BLUE_DARKER = '#063d6b';
+
 const TranscriptionResults = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,33 +71,29 @@ const handleStartSentimentAnalysis = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Container maxWidth="xlg">
-        <Box
-          sx={{
-            mt: 2,
-            mb: 2,
-            backgroundColor: '#f5f7fa',
-            borderRadius: 2,
-            p: 4,
-            minHeight: '70vh',
-          }}
-        >
+  <Box
+    sx={{
+      mt: 2,
+      mb: 2,
+      backgroundColor: 'var(--bg-light)',
+      borderRadius: 2,
+      p: 4,
+      minHeight: '70vh',
+      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.08)',
+      border: '1px solid rgba(8, 79, 130, 0.08)',
+    }}
+  >
           {/* Header with Back Button and Title */}
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-            <Button
-              startIcon={<ArrowBackIcon />}
-               onClick={() => navigate('/UploadFiles')}
-              sx={{
-                color: '#084F82',
-                textTransform: 'none',
-                fontSize: '18px',
-                fontWeight: 500,
-                '&:hover': {
-                  backgroundColor: 'transparent',
-                },
-              }}
-            >
-              Back
-            </Button>
+            <Box className="back-button-container" sx={{ mb: 0, mr: 2 }}>
+              <Button
+                startIcon={<ArrowBackIcon />}
+                onClick={() => navigate('/UploadFiles')}
+                className="back-button"
+              >
+                Back
+              </Button>
+            </Box>
             <Typography
               variant="h4"
               sx={{
@@ -113,25 +113,7 @@ const handleStartSentimentAnalysis = () => {
             <Button
               variant="contained"
               onClick={handleStartSentimentAnalysis}
-            //   disabled={selectedFiles.length === 0}
-              sx={{
-                backgroundColor: '#084F82',
-                color: '#fff',
-                fontSize: '16px',
-                fontWeight: 600,
-                textTransform: 'none',
-                py: 1.5,
-                px: 4,
-                borderRadius: 2,
-                boxShadow: 'none',
-                '&:hover': {
-                  backgroundColor: '#063d6b',
-                },
-                '&:disabled': {
-                  backgroundColor: '#ccc',
-                  color: '#666',
-                },
-              }}
+              className="action-button-primary"
             >
               Start Sentiment Analysis
             </Button>
@@ -145,7 +127,7 @@ const handleStartSentimentAnalysis = () => {
             >
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: '#084F82' }}>
+                  <TableRow sx={{ backgroundColor: PRIMARY_BLUE }}>
                     <TableCell
                       sx={{
                         color: '#fff',
@@ -189,13 +171,13 @@ const handleStartSentimentAnalysis = () => {
       // ... existing table row code ...
        <TableRow
                       key={index}
-                      sx={{ backgroundColor: index % 2 === 0 ? '#fff' : '#f3f4f6' }}
+                      sx={{ backgroundColor: index % 2 === 0 ? 'var(--bg-white)' : 'var(--bg-gray)' }}
                     >
                       <TableCell sx={{ p: 2, textAlign: 'center' }}>
                         <Checkbox
                           sx={{
-                            color: '#084F82',
-                            '&.Mui-checked': { color: '#084F82' },
+                            color: PRIMARY_BLUE,
+                            '&.Mui-checked': { color: PRIMARY_BLUE },
                           }}
                           checked={selectedFiles.includes(index)}
                           onChange={() => handleSelectFile(index)}

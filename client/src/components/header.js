@@ -15,9 +15,11 @@ import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [showProfileCard, setShowProfileCard] = useState(false);
+  const navigate = useNavigate();
 
   const handleProfileClick = () => {
     setShowProfileCard(!showProfileCard);
@@ -29,6 +31,7 @@ const Header = () => {
 
   const handleMyProfileClick = () => {
     console.log('My Profile clicked');
+    navigate('/profile');
     setShowProfileCard(false);
   };
 
@@ -56,12 +59,12 @@ const Header = () => {
 
         {/* Navigation Buttons */}
         <Box className="nav-buttons">
-          <Button
+          {/* <Button
             startIcon={<HomeIcon />}
             className="home-button"
           >
             Home
-          </Button>
+          </Button> */}
           
           <ClickAwayListener onClickAway={handleClickAway}>
             <Box className="profile-button-container">
