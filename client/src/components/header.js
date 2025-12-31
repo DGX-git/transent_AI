@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -10,16 +10,20 @@ import {
   ClickAwayListener,
   Avatar,
   Divider,
-} from '@mui/material';
-import HomeIcon from '@mui/icons-material/Home';
-import PersonIcon from '@mui/icons-material/Person';
-import LogoutIcon from '@mui/icons-material/Logout';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Header = () => {
   const [showProfileCard, setShowProfileCard] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const hideAccountRoutes = ["/login", "/register"];
+  const hideAccount = hideAccountRoutes.includes(location.pathname);
 
   const handleProfileClick = () => {
     setShowProfileCard(!showProfileCard);
@@ -30,13 +34,13 @@ const Header = () => {
   };
 
   const handleMyProfileClick = () => {
-    console.log('My Profile clicked');
-    navigate('/profile');
+    console.log("My Profile clicked");
+    navigate("/profile");
     setShowProfileCard(false);
   };
 
   const handleLogoutClick = () => {
-    console.log('Logout clicked');
+    console.log("Logout clicked");
     setShowProfileCard(false);
   };
 
@@ -47,9 +51,7 @@ const Header = () => {
         <Box className="logo-container">
           <Box className="logo-outer">
             <Box className="logo-inner">
-              <Typography className="logo-text">
-                TA
-              </Typography>
+              <Typography className="logo-text">TA</Typography>
             </Box>
           </Box>
           <Typography variant="h5" className="brand-name">
@@ -65,61 +67,61 @@ const Header = () => {
           >
             Home
           </Button> */}
-          
-          <ClickAwayListener onClickAway={handleClickAway}>
-            <Box className="profile-button-container">
-              <Button
-                endIcon={<KeyboardArrowDownIcon />}
-                className="account-button"
-                onClick={handleProfileClick}
-              >
-                <PersonIcon className="account-icon" />
-                Account
-              </Button>
-              
-              {showProfileCard && (
-                <Card className="profile-dropdown-card">
-                  <CardContent className="profile-dropdown-content">
-                    {/* User Info Section */}
-                    <Box className="user-info-section">
-                      <Avatar className="user-avatar">
-                        
-                      </Avatar>
-                      <Box className="user-details">
-                        <Typography className="user-name">
-                          User Name
-                        </Typography>
-                        <Typography className="user-email">
-                          user@gmail.com
-                        </Typography>
+
+          {!hideAccount && (
+            <ClickAwayListener onClickAway={handleClickAway}>
+              <Box className="profile-button-container">
+                <Button
+                  endIcon={<KeyboardArrowDownIcon />}
+                  className="account-button"
+                  onClick={handleProfileClick}
+                >
+                  <PersonIcon className="account-icon" />
+                  Account
+                </Button>
+
+                {showProfileCard && (
+                  <Card className="profile-dropdown-card">
+                    <CardContent className="profile-dropdown-content">
+                      {/* User Info */}
+                      <Box className="user-info-section">
+                        <Avatar className="user-avatar" />
+                        <Box className="user-details">
+                          <Typography className="user-name">
+                            User Name
+                          </Typography>
+                          <Typography className="user-email">
+                            user@gmail.com
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
 
-                    <Divider className="profile-divider" />
+                      <Divider className="profile-divider" />
 
-                    {/* Menu Options */}
-                    <Box className="menu-options">
-                      <Button
-                        startIcon={<PersonIcon />}
-                        className="menu-option-button"
-                        onClick={handleMyProfileClick}
-                      >
-                        My Profile
-                      </Button>
-                      
-                      <Button
-                        startIcon={<LogoutIcon />}
-                        className="menu-option-button logout-button"
-                        onClick={handleLogoutClick}
-                      >
-                        Logout
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </Card>
-              )}
-            </Box>
-          </ClickAwayListener>
+                      {/* Menu Options */}
+                      <Box className="menu-options">
+                        <Button
+                          startIcon={<PersonIcon />}
+                          className="menu-option-button"
+                          onClick={handleMyProfileClick}
+                        >
+                          My Profile
+                        </Button>
+
+                        <Button
+                          startIcon={<LogoutIcon />}
+                          className="menu-option-button logout-button"
+                          onClick={handleLogoutClick}
+                        >
+                          Logout
+                        </Button>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                )}
+              </Box>
+            </ClickAwayListener>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
