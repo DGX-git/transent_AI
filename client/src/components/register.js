@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -8,22 +8,18 @@ import {
   Paper,
   Snackbar,
   Alert,
-  Container,
   Link as MuiLink,
-  InputAdornment,
-  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 // Custom styled components with #084f82 theme
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(3),
   borderRadius: 12,
-  boxShadow: "0 25px 50px -12px rgba(8, 79, 130, 0.15), 0 0 0 1px rgba(8, 79, 130, 0.1)",
+  boxShadow:
+    "0 25px 50px -12px rgba(8, 79, 130, 0.15), 0 0 0 1px rgba(8, 79, 130, 0.1)",
   backgroundColor: "#fff",
   width: "100%",
   maxWidth: "400px",
@@ -85,13 +81,9 @@ export default function RegisterForm() {
     lastName: "",
     phoneNumber: "",
     email: "",
-    password: "",
-    acceptTerms: false,
   });
 
-  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showTermsModal, setShowTermsModal] = useState(false);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
@@ -107,12 +99,10 @@ export default function RegisterForm() {
       lastName: "",
       phoneNumber: "",
       email: "",
-      password: "",
     });
     setErrors({});
     setTouched({});
     setEmailValidationError("");
-    setShowPassword(false);
   }, []);
 
   const handleInputChange = (e) => {
@@ -181,15 +171,6 @@ export default function RegisterForm() {
           error = emailValidationError;
         }
         break;
-
-      case "password":
-        if (!value || !value.trim()) {
-          error = "Password is required";
-        } else if (value.length < 6) {
-          error = "Password must be at least 6 characters";
-        }
-        break;
-
       default:
         break;
     }
@@ -217,8 +198,6 @@ export default function RegisterForm() {
   };
 
   const handleSubmit = async () => {
-    console.log("API URL:", process.env.REACT_APP_DGX_API_URL);
-
     if (!validateForm()) return;
 
     setIsSubmitting(true);
@@ -229,15 +208,11 @@ export default function RegisterForm() {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email_id: formData.email,
-        password: formData.password,
         contact_no: formData.phoneNumber,
       };
 
-      console.log("Sending request to:", `${process.env.REACT_APP_DGX_API_URL}/register/createUser`);
-      console.log("Request data:", requestData);
-
       const res = await fetch(
-        `${process.env.REACT_APP_DGX_API_URL}/register/createUser`,
+        `${process.env.REACT_APP_TAI_API_URL}/register/createUser`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -245,9 +220,6 @@ export default function RegisterForm() {
         }
       );
       const data = await res.json();
-
-      console.log("Response status:", res.status);
-      console.log("Response data:", data);
 
       if (!res.ok) {
         if (data.message === "User already exists") {
@@ -261,18 +233,16 @@ export default function RegisterForm() {
         return;
       }
 
-
-         // Clear the form after successful registration
-    setFormData({
-      firstName: "",
-      lastName: "",
-      phoneNumber: "",
-      email: "",
-      password: "",
-    });
-    setErrors({});
-    setTouched({});
-    setEmailValidationError("");
+      // Clear the form after successful registration
+      setFormData({
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        email: "",
+      });
+      setErrors({});
+      setTouched({});
+      setEmailValidationError("");
 
       showSuccessMsg("Registration successful!");
       setTimeout(() => {
@@ -280,7 +250,9 @@ export default function RegisterForm() {
       }, 1500);
     } catch (error) {
       console.error("Frontend error:", error);
-      showErrorMsg("An error occurred. Please try again. Make sure the server is running on http://localhost:5000");
+      showErrorMsg(
+        "An error occurred. Please try again. Make sure the server is running on http://localhost:5000"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -292,7 +264,6 @@ export default function RegisterForm() {
       lastName: "",
       phoneNumber: "",
       email: "",
-      password: "",
     });
     setErrors({});
     setTouched({});
@@ -310,7 +281,6 @@ export default function RegisterForm() {
   };
 
   return (
-  
     <Box
       sx={{
         minHeight: "100vh",
@@ -321,7 +291,7 @@ export default function RegisterForm() {
         overflow: "hidden", // Prevent scrollbar
         position: "fixed",
         top: 100,
-        left: '35%',
+        left: "35%",
       }}
     >
       {/* Success Snackbar */}
@@ -369,7 +339,15 @@ export default function RegisterForm() {
       >
         <StyledPaper elevation={3}>
           <Box sx={{ textAlign: "center", mb: 2.5 }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold", color: "#1f2937", mb: 0.5 , fontSize: "1.5rem"}}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: "bold",
+                color: "#1f2937",
+                mb: 0.5,
+                fontSize: "1.5rem",
+              }}
+            >
               Register
             </Typography>
           </Box>
@@ -378,7 +356,11 @@ export default function RegisterForm() {
             {/* First Name */}
             <StyledTextField
               fullWidth
-              label={errors.firstName && touched.firstName ? errors.firstName : "First Name*"}
+              label={
+                errors.firstName && touched.firstName
+                  ? errors.firstName
+                  : "First Name*"
+              }
               name="firstName"
               value={formData.firstName}
               onChange={(e) => {
@@ -396,7 +378,11 @@ export default function RegisterForm() {
             {/* Last Name */}
             <StyledTextField
               fullWidth
-              label={errors.lastName && touched.lastName ? errors.lastName : "Last Name*"}
+              label={
+                errors.lastName && touched.lastName
+                  ? errors.lastName
+                  : "Last Name*"
+              }
               name="lastName"
               value={formData.lastName}
               onChange={(e) => {
@@ -414,7 +400,11 @@ export default function RegisterForm() {
             {/* Phone Number */}
             <StyledTextField
               fullWidth
-              label={errors.phoneNumber && touched.phoneNumber ? errors.phoneNumber : "Phone Number*"}
+              label={
+                errors.phoneNumber && touched.phoneNumber
+                  ? errors.phoneNumber
+                  : "Phone Number*"
+              }
               name="phoneNumber"
               value={formData.phoneNumber}
               onChange={(e) => {
@@ -429,56 +419,26 @@ export default function RegisterForm() {
               inputProps={{ maxLength: 10 }}
             />
 
-           {/* Email */}
-<StyledTextField
-  fullWidth
-  label={errors.email && touched.email ? errors.email : "Email Address*"}
-  name="email"
-  type="email"
-  autoComplete="off"
-  value={formData.email}
-  onChange={handleInputChange}
-  onBlur={handleBlur}
-  error={Boolean(errors.email && touched.email)}
-  inputProps={{
-    autoComplete: "new-email",
-    form: {
-      autoComplete: "off",
-    },
-  }}
-/>
-
-{/* Password */}
-{/* <StyledTextField
-  fullWidth
-  label={errors.password && touched.password ? errors.password : "Password*"}
-  name="password"
-  type={showPassword ? "text" : "password"}
-  autoComplete="new-password"
-  value={formData.password}
-  onChange={handleInputChange}
-  onBlur={handleBlur}
-  error={Boolean(errors.password && touched.password)}
-  inputProps={{
-    autoComplete: "new-password",
-    form: {
-      autoComplete: "off",
-    },
-  }}
-  InputProps={{
-    endAdornment: (
-      <InputAdornment position="end">
-        <IconButton
-          onClick={() => setShowPassword(!showPassword)}
-          edge="end"
-          sx={{ color: "#084f82" }}
-        >
-          {showPassword ? <VisibilityOff /> : <Visibility />}
-        </IconButton>
-      </InputAdornment>
-    ),
-  }}
-/> */}
+            {/* Email */}
+            <StyledTextField
+              fullWidth
+              label={
+                errors.email && touched.email ? errors.email : "Email Address*"
+              }
+              name="email"
+              type="email"
+              autoComplete="off"
+              value={formData.email}
+              onChange={handleInputChange}
+              onBlur={handleBlur}
+              error={Boolean(errors.email && touched.email)}
+              inputProps={{
+                autoComplete: "new-email",
+                form: {
+                  autoComplete: "off",
+                },
+              }}
+            />
 
             {/* Buttons */}
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>

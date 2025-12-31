@@ -1,6 +1,5 @@
 const sequelize = require("../config/sequelize.config");
 const USER = require("../model/users.model");
-const bcrypt = require("bcryptjs");
 
 const createUser = async (req, res) => {
   try {
@@ -11,12 +10,11 @@ const createUser = async (req, res) => {
       first_name,
       last_name,
       email_id,
-      password,
       contact_no
     } = req.body;
 
     // 🔹 Basic validation
-    if (!email_id || !password) {
+    if (!email_id) {
       console.warn("❌ Validation failed: Missing required fields");
       return res.status(400).json({
         message: "Required fields missing",
@@ -51,10 +49,7 @@ const createUser = async (req, res) => {
     }
 
     console.log("✅ User does not exist, proceeding...");
-
-    // 🔹 Hash password
-    console.log("🔐 Hashing password...");
-    const hashedPassword = await bcrypt.hash(password, 10);
+ 
 
     // 🔹 Create user
     console.log("💾 Creating new user...");
@@ -62,7 +57,6 @@ const createUser = async (req, res) => {
       first_name,
       last_name,
       email_id,
-      password: hashedPassword,
       contact_no
     });
 

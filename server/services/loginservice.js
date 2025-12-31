@@ -17,7 +17,7 @@ const generateOtp = () => {
 };
 
 /**
- * Send OTP via email using Zoho SMTP
+ * Send OTP via email using Zoho SMTP (NON-BLOCKING)
  */
 const sendOtpEmail = async (email, otp) => {
   const transporter = nodemailer.createTransport({
@@ -46,8 +46,22 @@ Regards,
 Administration Team`,
   };
 
-  // Send the email
-  return transporter.sendMail(mailOptions);
+  // Send the email WITHOUT waiting for response
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("❌ Email sending failed:", error.message);
+      // Log OTP to console for development
+      console.log("\n" + "=".repeat(50));
+      console.log("📧 DEVELOPMENT MODE - OTP in Console");
+      console.log("=".repeat(50));
+      console.log(`Email: ${email}`);
+      console.log(`OTP Code: ${otp}`);
+      console.log(`Valid for: 10 minutes`);
+      console.log("=".repeat(50) + "\n");
+    } else {
+      console.log("✅ OTP email sent successfully");
+    }
+  });
 };
 
 /**
@@ -69,11 +83,11 @@ async function deleteOtp(otpId) {
 // ============================================
 
 /**
- * ENDPOINT 1: Send OTP
+ * ENDPOINT 1: Send OTP (OPTIMIZED - NO WAITING)
  * POST /login/send-otp
  * Body: { email: "user@example.com" }
  */
-const sendOtp = (async (req, res) => {
+const sendOtp = async (req, res) => {
   try {
     const { email } = req.body;
     const jwtSecretKey = process.env.JWT_SECRET_KEY;
@@ -98,7 +112,10 @@ const sendOtp = (async (req, res) => {
 
     // Step 2: Check if user exists
     console.log("🔍 Checking if user exists...");
-    const user = await USER.findOne({ where: { email_id: email } });
+    const user = await USER.findOne({ 
+      where: { email_id: email },
+      attributes: ['user_id', 'email_id', 'first_name', 'last_name']
+    });
 
     if (!user) {
       console.log("❌ User not found");
@@ -111,28 +128,16 @@ const sendOtp = (async (req, res) => {
 
     console.log(`✅ User found: ${user.first_name} ${user.last_name}`);
 
-    // Step 3: Generate OTP
+    // Step 3: Delete any existing OTPs for this user
+    await USER_OTP.destroy({
+      where: { user_id: user.user_id }
+    });
+
+    // Step 4: Generate OTP
     const otp = generateOtp();
     console.log(`🔐 Generated OTP: ${otp}`);
 
-    // Step 4: Send OTP via email
-    try {
-      await sendOtpEmail(email, otp);
-      console.log("✅ OTP email sent successfully");
-    } catch (emailError) {
-      console.error("❌ Email sending failed:", emailError.message);
-      
-      // Log OTP to console for development
-      console.log("\n" + "=".repeat(50));
-      console.log("📧 DEVELOPMENT MODE - OTP in Console");
-      console.log("=".repeat(50));
-      console.log(`Email: ${email}`);
-      console.log(`OTP Code: ${otp}`);
-      console.log(`Valid for: 10 minutes`);
-      console.log("=".repeat(50) + "\n");
-    }
-
-    // Step 5: Store OTP in database
+    // Step 5: Store OTP in database FIRST
     const otpRecord = await USER_OTP.create({
       otp,
       user_id: user.user_id,
@@ -142,19 +147,22 @@ const sendOtp = (async (req, res) => {
 
     console.log(`💾 OTP saved to database with ID: ${otpRecord.otp_id}`);
 
-    // Step 6: Set auto-delete timer (10 minutes = 600000 ms)
+    // Step 6: Send OTP email AFTER response (non-blocking)
+    sendOtpEmail(email, otp);
+
+    // Step 7: Set auto-delete timer (10 minutes = 600000 ms)
     setTimeout(() => {
       deleteOtp(otpRecord.otp_id);
     }, 600000);
 
-    // Step 7: Create temporary JWT token (1 minute for demo)
+    // Step 8: Create temporary JWT token
     const tempToken = jwt.sign(
       { email, user_id: user.user_id },
       jwtSecretKey,
-      { expiresIn: "1m" } // 🔴 DEMO: 1 minute
+      { expiresIn: "20m" }
     );
 
-    // Step 8: Send success response
+    // Step 9: Send IMMEDIATE response (don't wait for email)
     return res.status(200).json({
       success: true,
       message: "OTP sent successfully to your email",
@@ -172,14 +180,14 @@ const sendOtp = (async (req, res) => {
       error: error.message,
     });
   }
-});
+};
 
 /**
- * ENDPOINT 2: Verify OTP
+ * ENDPOINT 2: Verify OTP (FIXED - NO ASSOCIATIONS NEEDED)
  * POST /login/verify-otp
  * Body: { email: "user@example.com", otp: "123456" }
  */
-const verifyOtp = (async (req, res) => {
+const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
     const jwtSecretKey = process.env.JWT_SECRET_KEY;
@@ -194,8 +202,11 @@ const verifyOtp = (async (req, res) => {
       });
     }
 
-    // Step 2: Check if user exists
-    const user = await USER.findOne({ where: { email_id: email } });
+    // Step 2: Find user first (separate query)
+    const user = await USER.findOne({ 
+      where: { email_id: email },
+      attributes: ['user_id', 'email_id', 'first_name', 'last_name', 'contact_no']
+    });
 
     if (!user) {
       console.log("❌ User not found");
@@ -205,13 +216,15 @@ const verifyOtp = (async (req, res) => {
       });
     }
 
-    // Step 3: Verify OTP from database (with 5-minute validity check)
+    console.log(`✅ User found: ${user.first_name} ${user.last_name}`);
+
+    // Step 3: Find OTP for this user (separate query - NO JOIN)
     const otpRecord = await USER_OTP.findOne({
       where: {
         user_id: user.user_id,
         otp: otp,
         created_timestamp: {
-          [Op.gte]: new Date(Date.now() - 5 * 60 * 1000), // OTP valid for last 5 minutes
+          [Op.gte]: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes validity
         },
       },
     });
@@ -226,14 +239,7 @@ const verifyOtp = (async (req, res) => {
 
     console.log("✅ OTP verified successfully");
 
-    // Step 4: Mark OTP as verified (optional)
-    await otpRecord.update({
-      updated_timestamp: new Date(),
-      updated_by: 'System',
-      verified: true,
-    });
-
-       // Step 5: Generate JWT tokens (20 minutes session like JHS)
+    // Step 4: Generate JWT tokens
     const token = jwt.sign(
       {
         email,
@@ -256,33 +262,34 @@ const verifyOtp = (async (req, res) => {
       { expiresIn: "20m" }
     );
 
-    // Step 6: Set cookies (with JHS configuration)
+    // Step 5: Set cookies
     res.cookie("access-token", accessToken, {
       httpOnly: true,
       sameSite: "Strict",
-      secure: true, // Always true like JHS
-      maxAge: 10 * 60 * 1000, // 10 minutes
+      secure: true,
+      maxAge: 10 * 60 * 1000,
     });
 
     res.cookie("refresh-token", refreshToken, {
       httpOnly: true,
       sameSite: "Strict",
-      secure: true, // Always true like JHS
-      maxAge: 20 * 60 * 1000, // 20 minutes
+      secure: true,
+      maxAge: 20 * 60 * 1000,
     });
 
-    // Step 7: Delete OTP after successful verification
-    await USER_OTP.destroy({
+    // Step 6: Delete OTP in background (don't wait)
+    USER_OTP.destroy({
       where: { otp_id: otpRecord.otp_id },
+    }).then(() => {
+      console.log("🧹 OTP deleted after successful verification");
+    }).catch(err => {
+      console.error("❌ Error deleting OTP:", err);
     });
 
-    console.log("🧹 OTP deleted after successful verification");
-    console.log("⏱️  DEMO MODE: Session will expire in 1 minute");
-
-    // Step 8: Send success response
+    // Step 7: Send IMMEDIATE response
     return res.status(200).json({
       success: true,
-      message: "OTP verified successfully! Login complete. [DEMO: Session expires in 1 minute]",
+      message: "Login successful!",
       jwt_token: token,
       token: token,
       user: {
@@ -302,14 +309,14 @@ const verifyOtp = (async (req, res) => {
       error: error.message,
     });
   }
-});
+};
 
 /**
- * ENDPOINT 4: Check Session Status
+ * ENDPOINT 3: Check Session Status
  * GET /login/check-session
  * Checks if the current session is valid
  */
-const checkSession = (async (req, res) => {
+const checkSession = async (req, res) => {
   try {
     const accessToken = req.cookies['access-token'];
     
@@ -321,7 +328,6 @@ const checkSession = (async (req, res) => {
       });
     }
 
-    // Verify token
     const decoded = jwt.verify(
       accessToken,
       process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET_KEY
@@ -365,13 +371,13 @@ const checkSession = (async (req, res) => {
       sessionExpired: true
     });
   }
-});
+};
 
 /**
- * ENDPOINT 5: Sign Out
+ * ENDPOINT 4: Sign Out
  * POST /login/signout
  */
-const signOut = (async (req, res) => {
+const signOut = async (req, res) => {
   const accessToken = jwt.sign(
     { email: "", user_id: "" },
     process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET_KEY,
@@ -402,6 +408,6 @@ const signOut = (async (req, res) => {
     success: true,
     message: "Logged out successfully." 
   });
-});
-module.exports = { sendOtp, verifyOtp, checkSession, signOut  };
+};
 
+module.exports = { sendOtp, verifyOtp, checkSession, signOut };

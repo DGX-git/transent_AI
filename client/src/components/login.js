@@ -7,7 +7,6 @@ import {
   Paper,
   Snackbar,
   Alert,
-  InputAdornment,
   Link as MuiLink,
   TextField,
 } from "@mui/material";
@@ -21,7 +20,7 @@ import Header from "./header";
 
 // Custom styled components with blue theme (#084F82)
 const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3), // Reduced from 4
+  padding: theme.spacing(3),
   borderRadius: 12,
   boxShadow: "0 25px 50px -12px rgba(8, 79, 130, 0.15), 0 0 0 1px rgba(8, 79, 130, 0.1)",
   backgroundColor: "#fff",
@@ -33,7 +32,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   backgroundColor: "#084F82",
   color: "white",
   fontWeight: 600,
-  padding: "10px 16px", // Reduced padding
+  padding: "10px 16px",
   borderRadius: 8,
   textTransform: "none",
   boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
@@ -49,7 +48,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const StyledTextField = styled(TextField)(({ theme, error }) => ({
-  marginBottom: theme.spacing(1), // Reduced from 1.5
+  marginBottom: theme.spacing(1),
   "& .MuiOutlinedInput-root": {
     backgroundColor: "white",
     borderRadius: 8,
@@ -74,16 +73,15 @@ const StyledTextField = styled(TextField)(({ theme, error }) => ({
   },
   "& .MuiOutlinedInput-input": {
     color: "#1e3a5f",
-    padding: "14px 20px", // Reduced input padding
+    padding: "14px 20px",
   },
 }));
 
-// Individual OTP digit box
 const OTPDigitBox = styled("input")(({ theme }) => ({
-  width: "42px", // Reduced from 48px
+  width: "42px",
   height: "42px",
   textAlign: "center",
-  fontSize: "18px", // Reduced from 20px
+  fontSize: "18px",
   fontWeight: "bold",
   border: "2px solid #cfe2f3",
   borderRadius: "8px",
@@ -116,7 +114,6 @@ export default function EmailLoginWithOTP() {
   const [successMessage, setSuccessMessage] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
 
-  // Clear form when component mounts
   useEffect(() => {
     setEmail("");
     setOtpDigits(["", "", "", "", "", ""]);
@@ -125,7 +122,6 @@ export default function EmailLoginWithOTP() {
     setTouched({});
   }, []);
 
-  // Timer for resend OTP
   useEffect(() => {
     let interval;
     if (resendTimer > 0) {
@@ -141,6 +137,14 @@ export default function EmailLoginWithOTP() {
     setEmail(value);
     if (errors.email) {
       setErrors((prev) => ({ ...prev, email: "" }));
+    }
+  };
+
+  // Handle Enter key press for email field
+  const handleEmailKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSendOTP();
     }
   };
 
@@ -164,6 +168,14 @@ export default function EmailLoginWithOTP() {
     if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
       const prevInput = document.querySelector(`input[name="otp-${index - 1}"]`);
       if (prevInput) prevInput.focus();
+    }
+    // Handle Enter key press on OTP field
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const otp = otpDigits.join("");
+      if (otp.length === 6 && resendTimer > 0) {
+        handleVerifyOTP();
+      }
     }
   };
 
@@ -201,7 +213,7 @@ export default function EmailLoginWithOTP() {
 
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_DGX_API_URL}/login/send-otp`,
+        `${process.env.REACT_APP_TAI_API_URL}/login/send-otp`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -248,7 +260,7 @@ export default function EmailLoginWithOTP() {
     try {
       const otp = otpDigits.join("");
       const res = await fetch(
-        `${process.env.REACT_APP_DGX_API_URL}/login/verify-otp`,
+        `${process.env.REACT_APP_TAI_API_URL}/login/verify-otp`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -273,7 +285,7 @@ export default function EmailLoginWithOTP() {
       showSuccessMsg("Login successful!");
       setTimeout(() => {
         navigate("/UploadFiles");
-      }, 1500);
+      }, 1000);
     } catch (error) {
       showErrorMsg("An error occurred. Please try again.");
     } finally {
@@ -305,7 +317,6 @@ export default function EmailLoginWithOTP() {
   };
 
   return (
-    
     <Box
       sx={{
         width: "100vw",
@@ -319,7 +330,6 @@ export default function EmailLoginWithOTP() {
         left: 0,
       }}
     >
-
       <Header />
 
       <Snackbar
@@ -435,15 +445,9 @@ export default function EmailLoginWithOTP() {
                 type="email"
                 value={email}
                 onChange={handleEmailChange}
+                onKeyDown={handleEmailKeyDown}
                 onBlur={() => handleBlur("email")}
                 error={Boolean(errors.email && touched.email)}
-                // InputProps={{
-                //   startAdornment: (
-                //     <InputAdornment position="start">
-                //       {/* <EmailIcon sx={{ color: "#084F82", fontSize: 20 }} /> */}
-                //     </InputAdornment>
-                //   ),
-                // }}
               />
             )}
 
